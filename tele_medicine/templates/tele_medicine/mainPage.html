@@ -1,36 +1,37 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../../css/">
-    <link
-    href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css"
-    rel="stylesheet"
-/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TeleHealth Connect 24/7</title>
+    <link rel="stylesheet" href="{% static 'tele_medicine/css/main.css' %}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css" rel="stylesheet" />
 </head>
 <body>
     <main>
         <nav>
-            <h1>TeleMedicine</h1>
-            <button>Logout</button>
+            <h1>TeleHealth Connect 24/7</h1>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
         </nav>
-     <div id="section">
+        <div id="section">
            <div id="box1" class="box">
-            <img src="../Images/Diagnosis.jpg" alt="">
+            <img src="{% static 'tele_medicine/images/image6.jpg' %}" alt="" />
             <h2>diagnosis-chat</h2>
-            <a href="diagnosis.html"><button>Open It</button></a>
+            <a href="{% url 'diagnosis' %}"><button>Open It</button></a>
         </div>
         <div id="box2" class="box">
-            <img src="../Images/Doctor.jpg" alt="">
+            <img src="{% static 'tele_medicine/images/image4.jpg' %}" alt="" />
             <h2>doctor-details</h2>
             <a href="#"><button>Open It</button></a>
         </div>
         <div id="box3" class="box">
-            <img src="../Images/Location.jpg" alt="">
+            <img src="{% static 'tele_medicine/images/Location.jpg' %}" alt="" />
             <h2>Nearest Medi-Help Centre</h2>
-             <a href="navigation.html"><button>Open It</button></a>
+             <a href="{% url 'navigation' %}"><button>Open It</button></a>
         </div>
      </div>
     </main>

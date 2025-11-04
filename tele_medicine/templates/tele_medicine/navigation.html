@@ -1,15 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Locate Medical Centres</title>
-  <link rel="stylesheet" href="../css/navigation.css">
+  <link rel="stylesheet" href="{% static 'tele_medicine/css/navigation.css' %}" />
 </head>
 <body>
   <nav>
-    <h1>TeleMedicine</h1>
-    <button>Logout</button>
+    <h1>TeleHealth Connect 24/7</h1>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
   </nav>
   <main>
     <div class="map-container">

@@ -1,16 +1,20 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tele-Medicine Chat</title>
-  <link rel="stylesheet" href="../css/Diagnosis.css">
+  <link rel="stylesheet" href="{% static 'tele_medicine/css/Diagnosis.css' %}" />
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css" rel="stylesheet" />
 </head>
 <body>
   <nav>
-    <h1>TeleMedicine</h1>
-    <button>Logout</button>
+    <h1>TeleHealth Connect 24/7</h1>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
   </nav>
   <main>
     <div class="chat-card">

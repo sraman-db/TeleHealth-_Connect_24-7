@@ -25,22 +25,22 @@ nav {
     padding: 1rem 2rem;
     align-items: center;
     justify-content: space-between;
-    height: 7rem;
-    background: #1A2A4F;
+    height: 5rem;
+    background-color: white;
     font-family: medicine, sans-serif;
     box-shadow: 0 4px 20px rgba(0,0,0,0.07);
 }
 nav h1 {
-    color: white;
+    color: #d10f56;
     font-size: 2.7rem;
     letter-spacing: 2px;
 }
 nav button {
     padding: 0.6rem 1.3rem;
-    border: 0.2rem solid #fff;
+    border: 0.2rem solid black;
     border-radius: 10px;
     font-size: 1.15rem;
-    background: #fff;
+    background: #B77466;
     color: #222;
     font-weight: 600;
     cursor: pointer;
@@ -62,6 +62,9 @@ nav button:hover {
     padding: 2rem 1rem 1.5rem 1rem;
     flex-wrap: wrap;
     min-height: calc(100vh - 7rem - 3.5rem);
+    background-image: url("../Images/médico\ en\ bata\ de\ laboratorio\ médico\ con\ un\ estetoscopio_\ médico\ en\ el\ fondo\ del\ hospital\ con\ espacio\ de\ copia.\ estructura\ de\ alambre\ de\ baja\ poli_");
+    background-position: center;
+    background-size: cover;
 }
 
 
@@ -70,7 +73,7 @@ nav button:hover {
     max-width: 410px;
     min-width: 275px;
     min-height: 390px;
-    background: #FFE3C6;
+    background: rgba(222, 222, 209, 0.5);
     border-radius: 25px;
     margin: 1rem 0;
     display: flex;
@@ -81,6 +84,7 @@ nav button:hover {
     transition: box-shadow 0.3s, transform 0.3s;
     position: relative;
     overflow: hidden;
+    
 }
 .box:hover {
     box-shadow: 0 8px 32px rgba(38,50,56,.21);
@@ -125,7 +129,7 @@ nav button:hover {
 }
 .box button:hover {
     background: #1A2A4F;
-    color: #ff5858;
+    color: orange;
     transform: scale(1.08);
 }
 
@@ -175,6 +179,6 @@ nav button:hover {
     }
     .box button {
         font-size: 0.9rem;
-        padding: 0.5rem 1rem;
-    }
+        padding: 0.5rem 1rem;
+    }
 }
