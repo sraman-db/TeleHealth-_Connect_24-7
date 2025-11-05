@@ -15,3 +15,18 @@ class CustomUser(models.Model):
         db_table = 'telehealth_users'
 
 
+class MedicalCenter(models.Model):
+    # Map Django field names to actual database column names
+    unique_id = models.IntegerField(primary_key=True, db_column='unique_id')
+    name = models.CharField(max_length=255, db_column='center_name')
+    center_type = models.CharField(max_length=50, db_column='center_type')
+    latitude = models.FloatField(db_column='latitude')
+    longitude = models.FloatField(db_column='longitude')
+    #address = models.TextField(db_column='address', null=True, blank=True)
+
+    class Meta:
+        db_table = 'medical_centers'
+        managed = False  # Tell Django this table already exists
+
+    def __str__(self):
+        return self.name

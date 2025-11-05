@@ -6,6 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Locate Medical Centres</title>
   <link rel="stylesheet" href="{% static 'tele_medicine/css/navigation.css' %}" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <style>
+    #map { height: 600px; width: 100%; }
+    .no-results {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <nav>
@@ -18,13 +36,151 @@
   <main>
     <div class="map-container">
       <div class="map-controls">
-        <input type="text" placeholder="Search hospital, medicine shop, etc." class="map-search" />
-        <button class="map-btn">Map Button</button>
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Search by name or type (hospital, clinic, pharmacy)" class="map-search" />
+          <button id="searchButton" class="search-btn">Search</button>
+          <button id="resetButton" class="search-btn" style="margin-left: 10px;">Reset</button>
+        </div>
       </div>
-      <div class="map-display">
-        <span>Map</span>
-      </div>
+      <div id="noResults" class="no-results">No results found</div>
+      <div id="map" class="map-display"></div>
     </div>
   </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster-src.js"></script>
+
+  <script>
+    // Parse the JSON data from Django
+    const centers = JSON.parse('{{ medical_centers|escapejs }}');
+    const bhCenter = [{{ bhubaneswar_lat }}, {{ bhubaneswar_lng }}];
+    
+    console.log('Medical centers loaded:', centers.length);
+    
+    // Initialize the map
+    const map = L.map('map').setView(bhCenter, 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+      attribution: '© OpenStreetMap contributors' 
+    }).addTo(map);
+
+    // Create marker cluster group
+    const markers = L.markerClusterGroup();
+    const markerList = [];
+    
+    // Add all centers to the map
+    centers.forEach(c => {
+      const m = L.marker([c.latitude, c.longitude]);
+      m.bindPopup(`<b>${c.name}</b><br>${c.center_type}<br>${c.address}`);
+      markers.addLayer(m);
+      markerList.push({ marker: m, center: c });
+    });
+    
+    map.addLayer(markers);
+
+    // Get DOM elements
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const resetButton = document.getElementById('resetButton');
+    const noResults = document.getElementById('noResults');
+
+    // Reset all markers to show everything
+    function resetMarkers() {
+      markers.clearLayers();
+      markerList.forEach(o => markers.addLayer(o.marker));
+      map.setView(bhCenter, 12);
+      noResults.style.display = 'none';
+      searchInput.value = '';
+    }
+
+    // Search function
+    function searchCenters(query) {
+      query = (query || '').trim().toLowerCase();
+      
+      if (!query) {
+        resetMarkers();
+        return;
+      }
+
+      // Clear current markers
+      markers.clearLayers();
+      const matched = [];
+
+      // Define type keywords for exact matching
+      const typeMap = {
+        'hospital': 'hospital',
+        'hospitals': 'hospital',
+        'clinic': 'clinic',
+        'clinics': 'clinic',
+        'pharmacy': 'pharmacy',
+        'pharmacies': 'pharmacy',
+        'dispensary': 'dispensary',
+        'dispensaries': 'dispensary'
+      };
+
+      // Check if query is a type keyword
+      const isTypeSearch = typeMap.hasOwnProperty(query);
+      const targetType = isTypeSearch ? typeMap[query] : null;
+
+      // Filter markers
+      markerList.forEach(({marker, center}) => {
+        let matches = false;
+
+        if (isTypeSearch) {
+          // If searching by type, match center_type exactly
+          matches = center.center_type.toLowerCase().includes(targetType);
+        } else {
+          // Otherwise, search in name, address, and type
+          const searchText = `${center.name} ${center.address} ${center.center_type}`.toLowerCase();
+          matches = searchText.includes(query);
+        }
+
+        if (matches) {
+          markers.addLayer(marker);
+          matched.push(center);
+        }
+      });
+
+      // Handle results
+      if (matched.length === 0) {
+        // No matches found
+        noResults.style.display = 'block';
+        setTimeout(() => {
+          noResults.style.display = 'none';
+        }, 3000);
+        map.setView(bhCenter, 12);
+      } else if (matched.length === 1) {
+        // Single result - zoom to it
+        noResults.style.display = 'none';
+        map.setView([matched[0].latitude, matched[0].longitude], 15);
+        // Open popup for single result
+        markerList.find(m => m.center === matched[0]).marker.openPopup();
+      } else {
+        // Multiple results - fit bounds
+        noResults.style.display = 'none';
+        const bounds = matched.map(c => [c.latitude, c.longitude]);
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+
+      console.log(`Search "${query}": ${matched.length} results`);
+    }
+
+    // Event listeners
+    searchButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      searchCenters(searchInput.value);
+    });
+
+    resetButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      resetMarkers();
+    });
+
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchCenters(searchInput.value);
+      }
+    });
+  </script>
 </body>
 </html>

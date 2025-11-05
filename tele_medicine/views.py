@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import IntegrityError
 from django.contrib.auth.hashers import make_password, check_password
-from .models import CustomUser
+from .models import CustomUser, MedicalCenter
+import json
 
 
 def logout_view(request):
@@ -11,7 +12,34 @@ def logout_view(request):
     return redirect('home')
 
 def navigation(request):
-    return render(request, 'tele_medicine/navigation.html')
+    # Load centers via ORM
+    centers = MedicalCenter.objects.all()
+    centers_data = []
+    
+    for c in centers:
+        try:
+            lat = float(c.latitude) if c.latitude is not None else None
+            lng = float(c.longitude) if c.longitude is not None else None
+        except (ValueError, TypeError):
+            continue
+            
+        if lat is None or lng is None:
+            continue
+            
+        centers_data.append({
+            'name': c.name,
+            'latitude': lat,
+            'longitude': lng,
+            'center_type': c.center_type,
+        })
+
+    context = {
+        'medical_centers': json.dumps(centers_data),
+        'bhubaneswar_lat': 20.2961,
+        'bhubaneswar_lng': 85.8245
+    }
+    return render(request, 'tele_medicine/navigation.html', context)
+
 
 def diagnosis(request):
     return render(request, 'tele_medicine/Diagnosis.html')
@@ -24,23 +52,6 @@ def about(request):
 
 def services(request):
     return render(request, 'tele_medicine/services.html')
-
-def login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        try:
-            user = CustomUser.objects.get(email=email)
-            if user and user.password and check_password(password, user.password):
-                # Set up session
-                request.session['user_id'] = user.id
-                messages.success(request, f'Welcome back, {user.first_name}!')
-                return redirect('mainpage')
-            else:
-                messages.error(request, 'Invalid credentials')
-        except CustomUser.DoesNotExist:
-            messages.error(request, 'Invalid credentials')
-    return render(request, 'tele_medicine/login.html')
 
 def main_page(request):
     return render(request, 'tele_medicine/mainPage.html')
@@ -83,3 +94,21 @@ def signup(request):
         messages.success(request, 'Account created successfully. Please log in.')
         return redirect('login')
     return render(request,'tele_medicine/signup.html')
+
+
+def login(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        try:
+            user = CustomUser.objects.get(email=email)
+            if user and user.password and check_password(password, user.password):
+                # Set up session
+                request.session['user_id'] = user.id
+                messages.success(request, f'Welcome back, {user.first_name}!')
+                return redirect('mainpage')
+            else:
+                messages.error(request, 'Invalid credentials')
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'Invalid credentials')
+    return render(request, 'tele_medicine/login.html')

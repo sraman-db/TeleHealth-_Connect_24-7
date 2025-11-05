@@ -1,9 +1,11 @@
+
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TeleHealth Connect 24/7 - Login</title>
   <style>
     body {
@@ -152,6 +154,7 @@
     }
 
     @media (max-width: 600px) {
+
       .main {
         width: 90%;
         padding: 20px;
@@ -177,6 +180,25 @@
         font-weight: 500;
       }
     }
+
+    .login-error-message {
+      background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%);
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: bold;
+      padding: 22px 28px;
+      border-radius: 14px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 18px rgba(255, 95, 109, 0.15);
+      text-align: center;
+      letter-spacing: 1px;
+      border: 2px solid #ff5f6d;
+      animation: fadeIn 0.5s;
+      max-width: 100%;
+      width: 100%;
+      display: block;
+    }
+    
   </style>
 </head>
 
@@ -189,9 +211,15 @@
     <h1>TeleHealth Connect 24/7</h1>
     <h3>Login to your account</h3>
 
-    <div class="success-message" id="successMessage">
-      Login successful! Welcome back! 🎉
-    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="login-error-message{% if message.tags %} {{ message.tags }}{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  
 
     <form id="loginForm" method="post" action="{% url 'login' %}">
       {% csrf_token %}
@@ -209,6 +237,7 @@
     </p>
   </div>
   <!-- Removed client-side interception: form now posts to Django login view -->
+
 </body>
 
 </html>
